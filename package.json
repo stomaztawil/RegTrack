@@ -18,8 +18,7 @@
   },
   "homepage": "https://github.com/stomaztawil/RegTrack#readme",
   "dependencies": {
-    "asterisk-ami-client": "^1.1.5",
-    "asterisk-manager": "^0.2.0",
+"node-ami": "^0.1.0",
     "mysql2": "^3.14.0"
   }
 }

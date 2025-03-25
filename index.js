@@ -1,49 +1,50 @@
-// Importa o módulo AMI correto
-const ami = require('asterisk-manager');
+// Substitua asterisk-manager por node-ami
+const AMI = require('node-ami');
 
-// Configurações do AMI (ajuste com seus dados!)
+// Configurações do AMI
 const config = {
-  port: 5038,              // Porta do AMI
-  host: '10.37.129.3',  // IP do servidor Asterisk
-  username: 'admin',       // Usuário AMI (criado no manager.conf)
-  password: 'password',    // Senha AMI
-  reconnect: true,
-  events: 'on'          // Reconectar automaticamente se cair
+  host: '10.37.129.3',
+  port: 5038,
+  username: 'admin',
+  password: 'password',
+  reconnect: true
 };
 
-// Cria a conexão com o AMI
-const manager = ami(
-  config.port,
-  config.host,
-  config.username,
-  config.password,
-  config.reconnect
-);
+// Cria a conexão
+const ami = new AMI(config);
 
 // Evento: Conexão estabelecida
-manager.on('connect', () => {
+ami.on('connect', () => {
   console.log('✅ Conectado ao AMI! Ouvindo todos os eventos...\n');
-
-  // Habilita recebimento de eventos (sem filtros)
-  manager.action({
+  
+  // Habilita recebimento de eventos
+  ami.action({
     Action: 'Events',
-    EventMask: 'on'  // Recebe TUDO
+    EventMask: 'on'
   });
 });
 
 // Evento: Erro de conexão
-manager.on('error', (err) => {
+ami.on('error', (err) => {
   console.error('❌ Erro no AMI:', err.message);
 });
 
-// Evento: Qualquer evento recebido do Asterisk
-manager.on('event', (event) => {
+// Evento: Dados brutos recebidos (debug)
+ami.on('data', (rawData) => {
+  console.log('📦 Dado bruto:', rawData.toString().trim());
+});
+
+// Evento: Qualquer evento processado
+ami.on('event', (event) => {
   console.log('📡 Evento recebido:', event);
 });
 
-// Encerra gracefulmente com Ctrl+C
+// Encerramento
 process.on('SIGINT', () => {
   console.log('\n🔴 Desconectando...');
-  manager.disconnect();
+  ami.disconnect();
   process.exit();
 });
+
+// Inicia a conexão
+ami.connect();
