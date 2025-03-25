@@ -1,20 +1,24 @@
 {
-    "name": "regtrack",
-    "version": "1.0.0",
-    "description": "",
-    "main": "index.js",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "node index.js"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/stomaztawil/RegTrack.git"
-    },
-    "author": "Thiago B Tawil",
-    "license": "ISC",
-    "bugs": {
-      "url": "https://github.com/stomaztawil/RegTrack/issues"
-    },
-    "homepage": "https://github.com/stomaztawil/RegTrack#readme"
+  "name": "regtrack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stomaztawil/RegTrack.git"
+  },
+  "author": "Thiago B Tawil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stomaztawil/RegTrack/issues"
+  },
+  "homepage": "https://github.com/stomaztawil/RegTrack#readme",
+  "dependencies": {
+    "asterisk-manager": "^0.2.0",
+    "mysql2": "^3.14.0"
   }
+}
