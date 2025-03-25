@@ -28,6 +28,7 @@ async function createTableIfNotExists(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS ami_events (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      date DATETIME NOT NULL,
       event_name VARCHAR(100) NOT NULL,
       event_data JSON NOT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -85,11 +86,8 @@ async function startAMIClient() {
     amiConnection.on('managerevent', (event) => {
       if (eventosPermitidos.includes(event.event)) {
         console.log('Evento recebido:', event);
-        console.log('Peer: ' ,event.peerstatus);
-        console.log('Peer: ' ,event.peerstatus);
-        console.log('Peer: ' ,event.peerstatus);
-        console.log('Peer: ' ,event.peerstatus);
-        console.log('Peer: ' ,event.peerstatus);
+        console.log('Peer: ' ,event.peer);
+        persistEvent()
       } else {
         console.log('Evento ignorado:', event.event);
       }
