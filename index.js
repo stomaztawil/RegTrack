@@ -21,7 +21,8 @@ const mysqlConfig = {
 // Escutar todos os eventos dentro do array
 const eventosPermitidos = [
   'PeerStatus',
-  'ContactStatus'
+  'ContactStatus',
+  'DeviceStateChange'
 ];
 
 // Criar tabela se não existir (opcional)
