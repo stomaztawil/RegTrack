@@ -85,7 +85,7 @@ async function startAMIClient() {
     amiConnection.on('managerevent', (event) => {
       if (eventosPermitidos.includes(event.event)) {
         console.log('Evento recebido:', event);
-        console.log('JSON:', JSON.parse(event));
+        console.log('JSON:', JSON.parse(event.event));
         //persistEvent(event);
       } else {
         console.log('Evento ignorado:', event);
