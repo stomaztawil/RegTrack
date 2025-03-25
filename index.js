@@ -39,6 +39,8 @@ async function persistEvent(event) {
     
     // Extrai o nome do evento (removendo espaços e caracteres especiais)
     const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
+    console.log(eventName);
+    console.log(JSON.stringify(event));
     
     // Insere o evento no banco de dados
     await connection.execute(
@@ -78,7 +80,7 @@ async function startAMIClient() {
     // Escutar todos os eventos
     amiConnection.on('managerevent', (event) => {
       console.log('Evento recebido:', event);
-      //persistEvent(event);
+      persistEvent(event);
     });
 
     // Conectar ao AMI
