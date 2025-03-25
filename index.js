@@ -69,7 +69,7 @@ manager.on('error', (err) => {
 // ======================================
 manager.on('event', (event) => {
   // Filtra apenas eventos de register/unregister
-  if (event.Event === 'PeerStatus') {
+  //if (event.Event === 'PeerStatus') {
     const peer = event.Peer;
     const status = event.PeerStatus;
     
@@ -87,7 +87,7 @@ manager.on('event', (event) => {
         console.error('Erro ao salvar evento:', err.message);
       }
     });
-  }
+  //}
 });
 
 // ======================================
