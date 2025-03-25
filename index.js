@@ -55,8 +55,8 @@ async function persistEvent(event) {
     
     // Insere o evento no banco de dados
     await connection.execute(
-      'INSERT INTO ami_events (CompanyId, Exten, Status, Time) VALUES (?, ?, ?, ?)',
-      [companyId, exten, event.peerstatus, NOW()]
+      'INSERT INTO ami_events (CompanyId, Exten, Status, Time, NOW()) VALUES (?, ?, ?)',
+      [companyId, exten, event.peerstatus]
     );
     
     console.log(`Evento ${eventName} persistido com sucesso`);
