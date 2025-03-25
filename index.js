@@ -68,26 +68,7 @@ manager.on('error', (err) => {
 // TRATAMENTO DE EVENTOS
 // ======================================
 manager.on('event', (event) => {
-  // Filtra apenas eventos de register/unregister
-  //if (event.Event === 'PeerStatus') {
-    const peer = event.Peer;
-    const status = event.PeerStatus;
-    
-    console.log(`📡 Evento SIP: Peer ${peer} - Status: ${status}`);
-
-    // Persiste no MySQL
-    const query = `
-      INSERT INTO events 
-      (id, event_name, event_data, created_at) 
-      VALUES (?, ?, ?, NOW())
-    `;
-    
-    db.execute(query, [peer, status], (err) => {
-      if (err) {
-        console.error('Erro ao salvar evento:', err.message);
-      }
-    });
-  //}
+  console.log('📡 Evento recebido:', event);
 });
 
 // ======================================
