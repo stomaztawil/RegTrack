@@ -1,4 +1,4 @@
-const ami = require('ami-client');
+const ami = require('asterisk-manager');
 
 // Configurações do AMI
 const config = {
