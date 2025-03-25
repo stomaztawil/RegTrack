@@ -1,93 +1,56 @@
-const ami = require('asterisk-manager');
-const mysql = require('mysql2/promise'); // Usando a versão Promise
+const ami = require('ami-client');
 
-// Configurações
+// Configurações do AMI
 const config = {
-  ami: {
-    port: 5038,
-    host: '10.211.55.10',  // Substitua pelo IP correto
-    username: 'admin',
-    password: 'password',
-    reconnect: true
-  },
-  mysql: {
-    host: 'localhost',
-    user: 'regtrack',
-    password: 'password',
-    database: 'Moonu'
-  }
+  port: 5038,               // Porta padrão do AMI
+  host: '10.37.129.3',   // IP do servidor Asterisk
+  username: 'admin',        // Usuário AMI (definido no manager.conf)
+  password: 'password',     // Senha AMI
+  reconnect: true,           // Tentar reconectar automaticamente
+  events: 'on'          // Para receber todos os eventos
 };
 
-// Conexão MySQL
-async function setupDB() {
-  const db = await mysql.createConnection(config.mysql);
-  console.log('✅ Conectado ao MySQL com sucesso!');
-  return db;
-}
+// Criar conexão AMI
+const manager = ami(config.port, config.host, config.username, config.password, true);
 
-// Conexão AMI
-function setupAMI(db) {
-  const manager = ami(
-    config.ami.port,
-    config.ami.host,
-    config.ami.username,
-    config.ami.password,
-    config.ami.reconnect
-  );
-
-  manager.on('connect', () => {
-    console.log('✅ Conectado ao AMI!');
-    manager.action({
-      Action: 'Events',
-      EventMask: 'on'
-    }, (err) => {
-      if (err) console.error('Erro ao ativar eventos:', err);
-    });
-  });
-
-  manager.on('error', (err) => {
-    console.error('❌ Erro AMI:', err);
-  });
-
-  // Debug: Mostra dados brutos
-  manager.on('data', (data) => {
-    console.log('📦 Dado bruto:', data.toString().trim());
-  });
-
-  // Processa eventos
-  manager.on('event', async (event) => {
-    console.log('📡 Evento:', JSON.stringify(event, null, 2));
-    
-    // Filtra eventos PJSIP (ajuste conforme necessário)
-    if (event.Event === 'PeerStatus' || event.Event === 'ContactStatus') {
-      try {
-        await db.execute(
-          'INSERT INTO sip_events (event_type, peer, status, event_data) VALUES (?, ?, ?, ?)',
-          [event.Event, event.Peer || event.EndpointName, event.PeerStatus || event.ContactStatus, JSON.stringify(event)]
-        );
-      } catch (err) {
-        console.error('Erro ao salvar no MySQL:', err);
-      }
+// Manipuladores de eventos de conexão
+manager.on('connect', () => {
+  console.log('Conectado com sucesso ao AMI do Asterisk');
+  
+  // Habilitar recebimento de eventos
+  manager.action({
+    'Action': 'Events',
+    'EventMask': 'on'
+  }, (err, res) => {
+    if (err) {
+      console.error('Erro ao configurar eventos:', err);
+    } else {
+      console.log('Recebimento de eventos configurado');
     }
   });
+});
 
-  return manager;
-}
+manager.on('error', (err) => {
+  console.error('Erro na conexão AMI:', err);
+});
 
-// Inicialização
-(async () => {
-  try {
-    const db = await setupDB();
-    const manager = setupAMI(db);
-    
-    process.on('SIGINT', async () => {
-      console.log('\n🔴 Encerrando...');
-      manager.disconnect();
-      await db.end();
-      process.exit();
-    });
-  } catch (err) {
-    console.error('Erro na inicialização:', err);
-    process.exit(1);
-  }
-})();
+// Desconectar ao receber SIGINT (Ctrl+C)
+process.on('SIGINT', () => {
+  console.log('\nDesconectando do AMI...');
+  manager.disconnect();
+  process.exit();
+});
+
+// Manipulador para todos os eventos AMI
+manager.on('managerevent', (event) => {
+  console.log('Evento recebido:', JSON.stringify(event, null, 2));
+});
+
+// Manipulador para respostas de ações
+manager.on('response', (response) => {
+  console.log('Resposta recebida:', JSON.stringify(response, null, 2));
+});
+
+// Conectar ao AMI
+console.log('Conectando ao AMI...');
+manager.connect();
