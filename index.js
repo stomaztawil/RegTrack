@@ -18,6 +18,11 @@ const mysqlConfig = {
   database: 'Moonu'
 };
 
+// Escutar todos os eventos dentro do array
+const eventosPermitidos = [
+  'PeerStatus'
+];
+
 // Criar tabela se não existir (opcional)
 async function createTableIfNotExists(connection) {
   await connection.execute(`
@@ -76,19 +81,12 @@ async function startAMIClient() {
     amiConnection.on('error', (error) => {
       console.error('Erro na conexão AMI:', error);
     });
-    
-    // Escutar todos os eventos dentro do array
-    const eventosPermitidos = [
-      'PeerStatus',
-      'DeviceStateChange',
-      'ContactStatus'
-    ];
 
     amiConnection.on('managerevent', (event) => {
       if (eventosPermitidos.includes(event.event)) {
         console.log('Evento recebido:', event);
-        console.log('JSON:', event.event[0]);
-        persistEvent(event);
+        console.log('JSON:', JSON.parse(event));
+        //persistEvent(event);
       } else {
         console.log('Evento ignorado:', event);
       }
