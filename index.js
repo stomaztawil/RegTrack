@@ -78,7 +78,7 @@ async function startAMIClient() {
     // Escutar todos os eventos
     amiConnection.on('managerevent', (event) => {
       console.log('Evento recebido:', event.event);
-      persistEvent(event);
+      //persistEvent(event);
     });
 
     // Conectar ao AMI
