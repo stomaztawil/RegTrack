@@ -84,9 +84,14 @@ async function startAMIClient() {
 
     amiConnection.on('managerevent', (event) => {
       if (eventosPermitidos.includes(event.event)) {
-        console.log('Evento recebido:', event.peerstatus);
+        console.log('Evento recebido:', event);
+        console.log('Peer: ' ,event.peerstatus);
+        console.log('Peer: ' ,event.peerstatus);
+        console.log('Peer: ' ,event.peerstatus);
+        console.log('Peer: ' ,event.peerstatus);
+        console.log('Peer: ' ,event.peerstatus);
       } else {
-        console.log('Evento ignorado:', event);
+        console.log('Evento ignorado:', event.event);
       }
     });
 
