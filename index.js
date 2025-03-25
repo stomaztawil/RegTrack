@@ -76,12 +76,28 @@ async function startAMIClient() {
     amiConnection.on('error', (error) => {
       console.error('Erro na conexão AMI:', error);
     });
+    
+    // Escutar todos os eventos dentro do array
+    const eventosPermitidos = [
+      'Newchannel',
+      'Hangup',
+      'Dial',
+      'Bridge',
+      'Hold',
+      'Unhold',
+      'Newstate',
+      'Newexten',
+      'Newcallerid'
+    ];
 
-    // Escutar todos os eventos
     amiConnection.on('managerevent', (event) => {
-      console.log('Evento recebido:', event);
-      console.log('JSON:', event.JSON);
-      //persistEvent(event);
+      if (eventosPermitidos.includes(event.event)) {
+        console.log('Evento recebido:', event);
+        console.log('JSON:', event.JSON);
+        persistEvent(event);
+      } else {
+        console.log('Evento ignorado:', event);
+      }
     });
 
     // Conectar ao AMI
