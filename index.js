@@ -1,77 +1,101 @@
-// Importando as bibliotecas necessárias
-const AMIClient = require('ami-client'); // Para conectar ao AMI do Asterisk
-const mysql = require('mysql2'); // Para conectar ao MySQL
+// Importação dos módulos necessários
+const ami = require('asterisk-manager'); // Pacote correto para AMI
+const mysql = require('mysql2');         // Cliente MySQL
 
-// Configurações do AMI
-const amiConfig = {
-  host: '10.37.129.3', // Endereço IP do servidor Asterisk
-  port: 5038, // Porta padrão do AMI
-  username: 'admin', // Usuário do AMI
-  secret: 'password' // Senha do AMI
-};
+// ======================================
+// CONFIGURAÇÕES
+// ======================================
+const config = {
+  // Configurações do AMI (Asterisk)
+  ami: {
+    port: 5038,               // Porta padrão do AMI
+    host: '10.37.129.3',   // IP do servidor Asterisk
+    username: 'admin',        // Usuário AMI (definido no manager.conf)
+    password: 'password',     // Senha AMI
+    reconnect: true           // Tentar reconectar automaticamente
+  },
 
-// Configurações do MySQL
-const dbConfig = {
-  host: '10.37.129.3', // Endereço IP do servidor MySQL
-  user: 'root', // Usuário do MySQL
-  password: '', // Senha do MySQL
-  database: 'Moonu' // Nome do banco de dados
-};
-
-// Criando uma conexão com o MySQL
-const connection = mysql.createConnection(dbConfig);
-
-// Conectando ao banco de dados
-connection.connect((err) => {
-  if (err) {
-    console.error('Erro ao conectar ao MySQL:', err.stack);
-    return;
+  // Configurações do MySQL
+  mysql: {
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'Moonu'
   }
-  console.log('Conectado ao MySQL com sucesso!');
+};
+
+// ======================================
+// CONEXÃO COM O BANCO DE DADOS
+// ======================================
+const db = mysql.createConnection(config.mysql);
+
+db.connect((err) => {
+  if (err) {
+    console.error('Erro ao conectar ao MySQL:', err.message);
+    process.exit(1); // Encerra o aplicativo em caso de erro
+  }
+  console.log('✅ Conectado ao MySQL com sucesso!');
 });
 
-// Criando uma instância do cliente AMI
-const client = new AMIClient(amiConfig);
+// ======================================
+// CONEXÃO COM O AMI DO ASTERISK
+// ======================================
+const manager = ami(
+  config.ami.port,
+  config.ami.host,
+  config.ami.username,
+  config.ami.password,
+  config.ami.reconnect
+);
 
-// Conectando ao AMI
-client.connect()
-  .then(() => {
-    console.log('Conectado ao AMI com sucesso!');
-
-    // Escutando eventos do AMI
-    client.on('event', (event) => {
-      console.log('Evento recebido:', event);
-
-      // Persistindo o evento no MySQL
-      const query = 'INSERT INTO events (event_name, event_data) VALUES (?, ?)';
-      const values = [event.Event, JSON.stringify(event)];
-
-      connection.query(query, values, (error, results) => {
-        if (error) {
-          console.error('Erro ao inserir evento no MySQL:', error.stack);
-          return;
-        }
-        console.log('Evento inserido com sucesso! ID:', results.insertId);
-      });
-    });
-  })
-  .catch((err) => {
-    console.error('Erro ao conectar ao AMI:', err.stack);
+// Evento: Conexão estabelecida
+manager.on('connect', () => {
+  console.log('✅ Conectado ao AMI do Asterisk!');
+  
+  // Filtra apenas eventos de registers/unregisters SIP
+  manager.action({
+    Action: 'Events',
+    EventMask: 'on' // Recebe todos os eventos (podemos filtrar depois)
   });
-
-// Lidando com erros de conexão do AMI
-client.on('error', (err) => {
-  console.error('Erro na conexão AMI:', err.stack);
 });
 
-// Lidando com o encerramento da conexão do AMI
-client.on('close', () => {
-  console.log('Conexão AMI fechada.');
+// Evento: Erro de conexão
+manager.on('error', (err) => {
+  console.error('❌ Erro no AMI:', err.message);
 });
 
-// Encerrando a conexão com o MySQL ao fechar a aplicação
+// ======================================
+// TRATAMENTO DE EVENTOS
+// ======================================
+manager.on('event', (event) => {
+  // Filtra apenas eventos de register/unregister
+  if (event.Event === 'PeerStatus') {
+    const peer = event.Peer;
+    const status = event.PeerStatus;
+    
+    console.log(`📡 Evento SIP: Peer ${peer} - Status: ${status}`);
+
+    // Persiste no MySQL
+    const query = `
+      INSERT INTO sip_events 
+      (peer, status, event_time) 
+      VALUES (?, ?, NOW())
+    `;
+    
+    db.execute(query, [peer, status], (err) => {
+      if (err) {
+        console.error('Erro ao salvar evento:', err.message);
+      }
+    });
+  }
+});
+
+// ======================================
+// TRATAMENTO DE DESLIGAMENTO
+// ======================================
 process.on('SIGINT', () => {
-  connection.end();
-  console.log('Conexão com o MySQL encerrada.');
+  console.log('\n🔴 Encerrando aplicação...');
+  manager.disconnect();
+  db.end();
   process.exit();
 });
