@@ -18,8 +18,8 @@ const config = {
   // Configurações do MySQL
   mysql: {
     host: 'localhost',
-    user: 'root',
-    password: '',
+    user: 'regtrack',
+    password: 'password',
     database: 'Moonu'
   }
 };
