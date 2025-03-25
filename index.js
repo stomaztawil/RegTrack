@@ -28,6 +28,7 @@ async function createTableIfNotExists(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS ami_events (
       id INT AUTO_INCREMENT PRIMARY KEY,
+      CompanyId INT,
       Exten VARCHAR(100) NOT NULL,
       Status VARCHAR(100) NOT NULL,
       Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
