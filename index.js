@@ -48,35 +48,33 @@ const manager = ami(
   config.ami.reconnect
 );
 
-// Evento: Conexão estabelecida
+// Debug: Mostra a conexão sendo estabelecida
 manager.on('connect', () => {
-  console.log('✅ Conectado ao AMI do Asterisk!');
+  console.log('✅ Conectado ao AMI! Enviando comando Events...');
   
-  // Filtra apenas eventos de registers/unregisters SIP
   manager.action({
-    Action: 'Event',
-    EventMask: 'on' // Recebe todos os eventos (podemos filtrar depois)
+    Action: 'Events',
+    EventMask: 'on'
+  }, (err) => {
+    if (err) {
+      console.error('❌ Erro ao enviar comando Events:', err);
+    } else {
+      console.log('🔔 Comando Events enviado. Aguardando eventos...\n');
+    }
   });
 });
 
-// Evento: Erro de conexão
+// Debug: Mostra erros detalhados
 manager.on('error', (err) => {
-  console.error('❌ Erro no AMI:', err.message);
+  console.error('❌ ERRO AMI:', err.message);
 });
 
-// ======================================
-// TRATAMENTO DE EVENTOS
-// ======================================
+// Debug: Mostra eventos brutos (antes do parser)
+manager.on('data', (rawData) => {
+  console.log('📦 Dado bruto recebido:', rawData.toString().trim());
+});
+
+// Eventos processados
 manager.on('event', (event) => {
-  console.log('📡 Evento recebido:', event);
-});
-
-// ======================================
-// TRATAMENTO DE DESLIGAMENTO
-// ======================================
-process.on('SIGINT', () => {
-  console.log('\n🔴 Encerrando aplicação...');
-  manager.disconnect();
-  db.end();
-  process.exit();
+  console.log('📡 Evento processado:', JSON.stringify(event, null, 2));
 });
