@@ -5,7 +5,7 @@ const mysql = require('mysql2/promise'); // Usando a versão Promise
 const config = {
   ami: {
     port: 5038,
-    host: '10.37.129.2',  // Substitua pelo IP correto
+    host: '10.211.55.10',  // Substitua pelo IP correto
     username: 'admin',
     password: 'password',
     reconnect: true
