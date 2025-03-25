@@ -28,10 +28,10 @@ async function createTableIfNotExists(connection) {
   await connection.execute(`
     CREATE TABLE IF NOT EXISTS ami_events (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      date DATETIME NOT NULL,
-      event_name VARCHAR(100) NOT NULL,
-      event_data JSON NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      time DATETIME NOT NULL,
+      Exten VARCHAR(100) NOT NULL,
+      Status VARCHAR(100) NOT NULL,
+      Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `);
   console.log('Tabela verificada/criada com sucesso');
@@ -45,13 +45,19 @@ async function persistEvent(event) {
     
     // Extrai o nome do evento (removendo espaços e caracteres especiais)
     const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
+    const [prefix, ...rest] = peer.split('/');
+    const [companyId, exten] = rest[0].split('.');
+
     console.log(eventName);
-    console.log(JSON.stringify(event));
+    console.log('Peer: ' ,event.peer);
+    console.log('CompanyId: ' companyId);
+    console.log('Exten: ' exten);
+    console.log('Status: ' ,event.peerstatus);
     
     // Insere o evento no banco de dados
     await connection.execute(
-      'INSERT INTO ami_events (event_name, event_data) VALUES (?, ?)',
-      [eventName, JSON.stringify(event)]
+      'INSERT INTO ami_events (CompanyId, Exten, Status, Time) VALUES (?, ?, ?, ?)',
+      [companyId, exten, event.peerstatus, NOW()]
     );
     
     console.log(`Evento ${eventName} persistido com sucesso`);
@@ -86,9 +92,7 @@ async function startAMIClient() {
     amiConnection.on('managerevent', (event) => {
       if (eventosPermitidos.includes(event.event)) {
         console.log('Evento recebido:', event);
-        console.log('Peer: ' ,event.peer);
-        console.log('Status: ' ,event.peerstatus);
-        //persistEvent()
+        persistEvent(event)
       } else {
         console.log('Evento ignorado:', event.event);
       }
