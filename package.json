@@ -1,0 +1,13 @@
+{
+    "name": "asterisk-ami-listener",
+    "version": "1.0.0",
+    "description": "Aplicação Node.js para escutar eventos do Asterisk AMI e persistir no MySQL",
+    "main": "index.js",
+    "scripts": {
+      "start": "node index.js"
+    },
+    "dependencies": {
+      "ami-client": "^0.2.0",
+      "mysql2": "^2.3.3"
+    }
+  }
