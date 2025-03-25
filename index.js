@@ -50,8 +50,8 @@ async function persistEvent(event) {
 
     console.log(eventName);
     console.log('Peer: ' ,event.peer);
-    console.log('CompanyId: ' companyId);
-    console.log('Exten: ' exten);
+    console.log('CompanyId: ', companyId);
+    console.log('Exten: ', exten);
     console.log('Status: ' ,event.peerstatus);
     
     // Insere o evento no banco de dados
