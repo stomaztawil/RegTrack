@@ -4,18 +4,18 @@ const mysql = require('mysql2'); // Para conectar ao MySQL
 
 // Configurações do AMI
 const amiConfig = {
-  host: '127.0.0.1', // Endereço IP do servidor Asterisk
+  host: '10.37.129.3', // Endereço IP do servidor Asterisk
   port: 5038, // Porta padrão do AMI
   username: 'admin', // Usuário do AMI
-  secret: 'admin' // Senha do AMI
+  secret: 'password' // Senha do AMI
 };
 
 // Configurações do MySQL
 const dbConfig = {
-  host: 'localhost', // Endereço IP do servidor MySQL
+  host: '10.37.129.3', // Endereço IP do servidor MySQL
   user: 'root', // Usuário do MySQL
-  password: 'password', // Senha do MySQL
-  database: 'asterisk_events' // Nome do banco de dados
+  password: '', // Senha do MySQL
+  database: 'Moonu' // Nome do banco de dados
 };
 
 // Criando uma conexão com o MySQL
