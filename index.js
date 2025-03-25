@@ -87,7 +87,8 @@ async function startAMIClient() {
       if (eventosPermitidos.includes(event.event)) {
         console.log('Evento recebido:', event);
         console.log('Peer: ' ,event.peer);
-        persistEvent()
+        console.log('Status: ' ,event.peerstatus);
+        //persistEvent()
       } else {
         console.log('Evento ignorado:', event.event);
       }
