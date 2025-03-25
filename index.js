@@ -44,7 +44,7 @@ async function persistEvent(event) {
     
     // Extrai o nome do evento (removendo espaços e caracteres especiais)
     const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
-    const [prefix, ...rest] = peer.split('/');
+    const [prefix, ...rest] = event.peer.split('/');
     const [companyId, exten] = rest[0].split('.');
 
     console.log(eventName);
