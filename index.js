@@ -1,21 +1,15 @@
-// Importação dos módulos necessários
-const ami = require('asterisk-manager'); // Pacote correto para AMI
-const mysql = require('mysql2');         // Cliente MySQL
+const ami = require('asterisk-manager');
+const mysql = require('mysql2/promise'); // Usando a versão Promise
 
-// ======================================
-// CONFIGURAÇÕES
-// ======================================
+// Configurações
 const config = {
-  // Configurações do AMI (Asterisk)
   ami: {
-    port: 5038,               // Porta padrão do AMI
-    host: '10.37.129.3',   // IP do servidor Asterisk
-    username: 'admin',        // Usuário AMI (definido no manager.conf)
-    password: 'password',     // Senha AMI
-    reconnect: true           // Tentar reconectar automaticamente
+    port: 5038,
+    host: '10.37.129.2',  // Substitua pelo IP correto
+    username: 'admin',
+    password: 'password',
+    reconnect: true
   },
-
-  // Configurações do MySQL
   mysql: {
     host: 'localhost',
     user: 'regtrack',
@@ -24,57 +18,76 @@ const config = {
   }
 };
 
-// ======================================
-// CONEXÃO COM O BANCO DE DADOS
-// ======================================
-const db = mysql.createConnection(config.mysql);
-
-db.connect((err) => {
-  if (err) {
-    console.error('Erro ao conectar ao MySQL:', err.message);
-    process.exit(1); // Encerra o aplicativo em caso de erro
-  }
+// Conexão MySQL
+async function setupDB() {
+  const db = await mysql.createConnection(config.mysql);
   console.log('✅ Conectado ao MySQL com sucesso!');
-});
+  return db;
+}
 
-// ======================================
-// CONEXÃO COM O AMI DO ASTERISK
-// ======================================
-const manager = ami(
-  config.ami.port,
-  config.ami.host,
-  config.ami.username,
-  config.ami.password,
-  config.ami.reconnect
-);
+// Conexão AMI
+function setupAMI(db) {
+  const manager = ami(
+    config.ami.port,
+    config.ami.host,
+    config.ami.username,
+    config.ami.password,
+    config.ami.reconnect
+  );
 
-// Debug: Mostra a conexão sendo estabelecida
-manager.on('connect', () => {
-  console.log('✅ Conectado ao AMI! Enviando comando Events...');
-  
-  manager.action({
-    Action: 'Events',
-    EventMask: 'on'
-  }, (err) => {
-    if (err) {
-      console.error('❌ Erro ao enviar comando Events:', err);
-    } else {
-      console.log('🔔 Comando Events enviado. Aguardando eventos...\n');
+  manager.on('connect', () => {
+    console.log('✅ Conectado ao AMI!');
+    manager.action({
+      Action: 'Events',
+      EventMask: 'on'
+    }, (err) => {
+      if (err) console.error('Erro ao ativar eventos:', err);
+    });
+  });
+
+  manager.on('error', (err) => {
+    console.error('❌ Erro AMI:', err);
+  });
+
+  // Debug: Mostra dados brutos
+  manager.on('data', (data) => {
+    console.log('📦 Dado bruto:', data.toString().trim());
+  });
+
+  // Processa eventos
+  manager.on('event', async (event) => {
+    console.log('📡 Evento:', JSON.stringify(event, null, 2));
+    
+    // Filtra eventos PJSIP (ajuste conforme necessário)
+    if (event.Event === 'PeerStatus' || event.Event === 'ContactStatus') {
+      try {
+        await db.execute(
+          'INSERT INTO sip_events (event_type, peer, status, event_data) VALUES (?, ?, ?, ?)',
+          [event.Event, event.Peer || event.EndpointName, event.PeerStatus || event.ContactStatus, JSON.stringify(event)]
+        );
+      } catch (err) {
+        console.error('Erro ao salvar no MySQL:', err);
+      }
     }
   });
-});
 
-// Debug: Mostra erros detalhados
-manager.on('error', (err) => {
-  console.error('❌ ERRO AMI:', err.message);
-});
+  return manager;
+}
 
-// Debug: Mostra eventos brutos (antes do parser)
-manager.on('data', (rawData) => {
-  console.log('📦 Dado bruto recebido:', rawData.toString().trim());
-});
-
-// Eventos processados
-manager.on('event', (event) => {
-  console.log('📡 Evento processado:', JSON.stringify(event, null, 2));
-});
+// Inicialização
+(async () => {
+  try {
+    const db = await setupDB();
+    const manager = setupAMI(db);
+    
+    process.on('SIGINT', async () => {
+      console.log('\n🔴 Encerrando...');
+      manager.disconnect();
+      await db.end();
+      process.exit();
+    });
+  } catch (err) {
+    console.error('Erro na inicialização:', err);
+    process.exit(1);
+  }
+})();
