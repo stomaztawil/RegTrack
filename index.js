@@ -1,5 +1,5 @@
 // Substitua asterisk-manager por node-ami
-const AMI = require('node-ami');
+const AMI = require('node-asterisk-ami');
 
 // Configurações do AMI
 const config = {
