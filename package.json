@@ -1,13 +1,24 @@
 {
-    "name": "asterisk-ami-listener",
-    "version": "1.0.0",
-    "description": "Aplicação Node.js para escutar eventos do Asterisk AMI e persistir no MySQL",
-    "main": "index.js",
-    "scripts": {
-      "start": "node index.js"
-    },
-    "dependencies": {
-      "ami-client": "^0.2.0",
-      "mysql2": "^2.3.3"
-    }
+  "name": "regtrack",
+  "version": "1.0.0",
+  "description": "AMI Registry tracker",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stomaztawil/RegTrack.git"
+  },
+  "author": "Thiago B. Tawil",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stomaztawil/RegTrack/issues"
+  },
+  "homepage": "https://github.com/stomaztawil/RegTrack#readme",
+  "dependencies": {
+    "asterisk-ami-client": "^1.1.5",
+    "asterisk-manager": "^0.2.0",
+    "mysql2": "^3.14.0"
   }
+}
