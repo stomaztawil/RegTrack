@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise');
+const mysql = require('mysql2');
 const ami = require('asterisk-manager');
 
 // Configurações do AMI
