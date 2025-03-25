@@ -79,15 +79,9 @@ async function startAMIClient() {
     
     // Escutar todos os eventos dentro do array
     const eventosPermitidos = [
-      'Newchannel',
-      'Hangup',
-      'Dial',
-      'Bridge',
-      'Hold',
-      'Unhold',
-      'Newstate',
-      'Newexten',
-      'Newcallerid'
+      'PeerStatus',
+      'DeviceStateChange',
+      'ContactStatus'
     ];
 
     amiConnection.on('managerevent', (event) => {
