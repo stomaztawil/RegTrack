@@ -54,7 +54,7 @@ manager.on('connect', () => {
   
   // Filtra apenas eventos de registers/unregisters SIP
   manager.action({
-    Action: 'Events',
+    Action: 'Event',
     EventMask: 'on' // Recebe todos os eventos (podemos filtrar depois)
   });
 });
@@ -77,9 +77,9 @@ manager.on('event', (event) => {
 
     // Persiste no MySQL
     const query = `
-      INSERT INTO sip_events 
-      (peer, status, event_time) 
-      VALUES (?, ?, NOW())
+      INSERT INTO events 
+      (id, event_name, event_data, created_at) 
+      VALUES (?, ?, ?, NOW())
     `;
     
     db.execute(query, [peer, status], (err) => {
