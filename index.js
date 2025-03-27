@@ -50,11 +50,23 @@ async function persistEvent(event) {
     const [prefix, ...rest] = event.peer.split('/');
     const [companyId, exten] = rest[0].split('.');
 
-    console.log(eventName);
-    console.log('Peer: ' ,event.peer);
-    console.log('CompanyId: ', companyId);
-    console.log('Exten: ', exten);
-    console.log('Status: ' ,event.peerstatus);
+    switch(eventName) {
+      case 'DeviceStateChange':
+        console.log(eventName);
+    
+        break;
+      case 'PeerStatus':
+        console.log(eventName);
+        console.log('Peer: ' ,event.peer);
+        console.log('CompanyId: ', companyId);
+        console.log('Exten: ', exten);
+        console.log('Status: ' ,event.peerstatus);
+        break;
+      default:
+        console.log('Evento: ' + eventName + 'não tratado');
+    }
+
+
     
     // Insere o evento no banco de dados
     await connection.execute(
