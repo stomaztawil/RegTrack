@@ -51,16 +51,22 @@ async function persistEvent(event) {
     const [companyId, exten] = rest[0].split('.');
 
     switch(eventName) {
-      case 'DeviceStateChange':
+      case 'devicestatechange':
         console.log(eventName);
     
         break;
-      case 'PeerStatus':
+      case 'peerstatus':
         console.log(eventName);
         console.log('Peer: ' ,event.peer);
         console.log('CompanyId: ', companyId);
         console.log('Exten: ', exten);
         console.log('Status: ' ,event.peerstatus);
+        // Insere o evento no banco de dados
+        await connection.execute(
+          'INSERT INTO ami_events (CompanyId, Exten, Status, Time) VALUES (?, ?, ?, NOW())',
+          [companyId, exten, event.peerstatus]
+        );
+
         break;
       default:
         console.log('Evento: ' + eventName + 'não tratado');
@@ -68,11 +74,7 @@ async function persistEvent(event) {
 
 
     
-    // Insere o evento no banco de dados
-    await connection.execute(
-      'INSERT INTO ami_events (CompanyId, Exten, Status, Time) VALUES (?, ?, ?, NOW())',
-      [companyId, exten, event.peerstatus]
-    );
+
     
     console.log(`Evento ${eventName} persistido com sucesso`);
   } catch (error) {
