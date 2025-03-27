@@ -47,15 +47,15 @@ async function persistEvent(event) {
     
     // Extrai o nome do evento (removendo espaços e caracteres especiais)
     const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
-    const [prefix, ...rest] = event.peer.split('/');
-    const [companyId, exten] = rest[0].split('.');
-
+    
     switch(eventName) {
       case 'devicestatechange':
         console.log(eventName);
     
         break;
       case 'peerstatus':
+        const [prefix, ...rest] = event.peer.split('/');
+        const [companyId, exten] = rest[0].split('.');
         console.log(eventName);
         console.log('Peer: ' ,event.peer);
         console.log('CompanyId: ', companyId);
