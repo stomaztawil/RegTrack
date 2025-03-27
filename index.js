@@ -47,20 +47,15 @@ async function persistEvent(event) {
     
     // Extrai o nome do evento (removendo espaços e caracteres especiais)
     const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
-    
+    console.log("Evento: " + eventName);
     switch(eventName) {
       case 'devicestatechange':
-        console.log(eventName);
+        console.log('Nada feito ainda para: ' + eventName);
     
         break;
       case 'peerstatus':
         const [prefix, ...rest] = event.peer.split('/');
         const [companyId, exten] = rest[0].split('.');
-        console.log(eventName);
-        console.log('Peer: ' ,event.peer);
-        console.log('CompanyId: ', companyId);
-        console.log('Exten: ', exten);
-        console.log('Status: ' ,event.peerstatus);
         // Insere o evento no banco de dados
         await connection.execute(
           'INSERT INTO ami_events (CompanyId, Exten, Status, Time) VALUES (?, ?, ?, NOW())',
@@ -70,8 +65,9 @@ async function persistEvent(event) {
         console.log(`Evento ${eventName} persistido com sucesso`);
 
         break;
+        
       default:
-        console.log('Evento: ' + eventName + 'não tratado');
+        console.log('Evento: ' + eventName + ' não tratado');
     }
 
   } catch (error) {
@@ -104,7 +100,6 @@ async function startAMIClient() {
 
     amiConnection.on('managerevent', (event) => {
       if (eventosPermitidos.includes(event.event)) {
-        console.log('Evento recebido:', event);
         persistEvent(event)
       } else {
         console.log('Evento ignorado:', event.event);
