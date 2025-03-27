@@ -67,16 +67,13 @@ async function persistEvent(event) {
           [companyId, exten, event.peerstatus]
         );
 
+        console.log(`Evento ${eventName} persistido com sucesso`);
+
         break;
       default:
         console.log('Evento: ' + eventName + 'não tratado');
     }
 
-
-    
-
-    
-    console.log(`Evento ${eventName} persistido com sucesso`);
   } catch (error) {
     console.error('Erro ao persistir evento:', error);
   } finally {
