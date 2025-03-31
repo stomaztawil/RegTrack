@@ -48,6 +48,7 @@ class EventModel {
         ORDER BY 
             a.Time;`
        );
+       console.log('View verificada/criada com sucesso');
     }
   
     async persistPeerStatus(event) {
