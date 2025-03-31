@@ -23,29 +23,29 @@ class EventModel {
       console.log('Tabela verificada/criada com sucesso');
 
       await this.connection.execute(`CREATE OR REPLACE VIEW view_peerStatus AS
-    WITH ranked_events AS (
-    SELECT *,
-        LEAD(Status) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_status,
-        LEAD(Time) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_time
-    FROM ami_events
-    )
-    SELECT 
-        id,
-        CompanyId,
-        Exten,
-        Time as ReachableTime,
-        next_time as UnreachableTime,
-        TIMESTAMPDIFF(SECOND, Time, next_time) as DurationSeconds,
-        SEC_TO_TIME(TIMESTAMPDIFF(SECOND, Time, next_time)) as FormattedDuration
-    FROM ranked_events
-    WHERE 
-        Status = 'Reachable' AND 
-        next_status = 'Unreachable'
-    ORDER BY 
-        CompanyId, 
-        Exten, 
-        ReachableTime;`
-    );
+        WITH ranked_events AS (
+        SELECT *,
+            LEAD(Status) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_status,
+            LEAD(Time) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_time
+        FROM ami_events
+        )
+        SELECT 
+            id,
+            CompanyId,
+            Exten,
+            Time as ReachableTime,
+            next_time as UnreachableTime,
+            TIMESTAMPDIFF(SECOND, Time, next_time) as DurationSeconds,
+            SEC_TO_TIME(TIMESTAMPDIFF(SECOND, Time, next_time)) as FormattedDuration
+        FROM ranked_events
+        WHERE 
+            Status = 'Reachable' AND 
+            next_status = 'Unreachable'
+        ORDER BY 
+            CompanyId, 
+            Exten, 
+            ReachableTime;`
+      );
        console.log('View verificada/criada com sucesso');
     }
   
