@@ -21,6 +21,33 @@ class EventModel {
         )
       `);
       console.log('Tabela verificada/criada com sucesso');
+
+      await this.connection.execute(`CREATE VIEW view_peerStatus AS
+        SELECT 
+            a.id,
+            a.CompanyId,
+            a.Exten,
+            a.Status,
+            a.Time as StartTime,
+            MIN(b.Time) as EndTime,
+            TIMESTAMPDIFF(SECOND, a.Time, MIN(b.Time)) as DurationSeconds,
+            SEC_TO_TIME(TIMESTAMPDIFF(SECOND, a.Time, MIN(b.Time))) as FormattedDuration
+        FROM 
+            ami_events a
+        JOIN 
+            ami_events b ON a.CompanyId = b.CompanyId 
+            AND a.Exten = b.Exten
+            AND b.Time > a.Time
+            AND b.Status != a.Status
+        WHERE 
+            a.Status = 'Reachable'
+        GROUP BY 
+            a.id, a.CompanyId, a.Exten, a.Status, a.Time
+        HAVING
+            EndTime IS NOT NULL
+        ORDER BY 
+            a.Time;`
+       );
     }
   
     async persistPeerStatus(event) {
