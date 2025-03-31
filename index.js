@@ -1,126 +1,63 @@
-const mysql = require('mysql2');
-const ami = require('asterisk-manager');
+const amiConfig = require('./config/ami.config');
+const mysqlConfig = require('./config/mysql.config');
+const AMIService = require('./services/AMIService');
+const DatabaseService = require('./services/DatabaseService');
+const EventHandlers = require('./utils/eventHandlers');
 
-// Configurações do AMI
-const amiConfig = {
-  host: '10.37.129.3',
-  port: 5038, // Porta padrão do AMI
-  username: 'admin',
-  password: 'password',
-  events: 'on' // Habilitar recebimento de eventos
-};
+class App {
+  constructor() {
+    this.databaseService = new DatabaseService(mysqlConfig);
+    this.eventHandlers = null;
+    this.amiService = null;
+  }
 
-// Configurações do MySQL
-const mysqlConfig = {
-  host: '10.37.129.3',
-  user: 'regtrack',
-  password: 'password',
-  database: 'Moonu'
-};
-
-// Escutar todos os eventos dentro do array
-const eventosPermitidos = [
-  'PeerStatus',
-  'ContactStatus',
-  'DeviceStateChange'
-];
-
-// Criar tabela se não existir (opcional)
-async function createTableIfNotExists(connection) {
-  await connection.execute(`
-    CREATE TABLE IF NOT EXISTS ami_events (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      CompanyId INT,
-      Exten VARCHAR(100) NOT NULL,
-      Status VARCHAR(100) NOT NULL,
-      Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
-  console.log('Tabela verificada/criada com sucesso');
-}
-
-// Função para persistir evento no MySQL
-async function persistEvent(event) {
-  let connection;
-  try {
-    connection = await mysql.createConnection(mysqlConfig);
-    
-    // Extrai o nome do evento (removendo espaços e caracteres especiais)
-    const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
-    console.log("Evento: " + eventName);
-    switch(eventName) {
-      case 'devicestatechange':
-        console.log('Nada feito ainda para: ' + eventName);
-    
-        break;
-      case 'peerstatus':
-        const [prefix, ...rest] = event.peer.split('/');
-        const [companyId, exten] = rest[0].split('.');
-        // Insere o evento no banco de dados
-        await connection.execute(
-          'INSERT INTO ami_events (CompanyId, Exten, Status, Time) VALUES (?, ?, ?, NOW())',
-          [companyId, exten, event.peerstatus]
-        );
-
-        console.log(`Evento ${eventName} persistido com sucesso`);
-
-        break;
-        
-      default:
-        console.log('Evento: ' + eventName + ' não tratado');
+  async start() {
+    try {
+      // Inicializa banco de dados
+      await this.databaseService.initialize();
+      
+      // Configura handlers de eventos
+      this.eventHandlers = new EventHandlers(this.databaseService.getModel());
+      
+      // Inicia serviço AMI
+      this.amiService = new AMIService(amiConfig, this.eventHandlers);
+      this.amiService.connect();
+      
+      // Configura tratamento de sinais do sistema
+      this.setupShutdownHandlers();
+      
+      console.log('Aplicação iniciada com sucesso');
+    } catch (error) {
+      console.error('Falha ao iniciar aplicação:', error);
+      this.shutdown(1);
     }
-
-  } catch (error) {
-    console.error('Erro ao persistir evento:', error);
-  } finally {
-    if (connection) await connection.end();
   }
-}
 
-// Iniciar conexão AMI e escutar eventos
-async function startAMIClient() {
-  try {
-    // Conectar ao MySQL e criar tabela se necessário
-    const mysqlConnection = await mysql.createConnection(mysqlConfig);
-    await createTableIfNotExists(mysqlConnection);
-    await mysqlConnection.end();
+  setupShutdownHandlers() {
+    process.on('SIGINT', () => this.shutdown());
+    process.on('SIGTERM', () => this.shutdown());
+  }
 
-    // Criar conexão AMI
-    const amiConnection = ami(amiConfig.port, amiConfig.host, amiConfig.username, amiConfig.password, true);
-
-    // Evento de conexão bem-sucedida
-    amiConnection.on('connect', () => {
-      console.log('Conectado ao AMI com sucesso');
-    });
-
-    // Evento de erro
-    amiConnection.on('error', (error) => {
-      console.error('Erro na conexão AMI:', error);
-    });
-
-    amiConnection.on('managerevent', (event) => {
-      if (eventosPermitidos.includes(event.event)) {
-        persistEvent(event)
-      } else {
-        console.log('Evento ignorado:', event.event);
+  async shutdown(exitCode = 0) {
+    console.log('Encerrando aplicação...');
+    
+    try {
+      if (this.amiService) {
+        this.amiService.disconnect();
       }
-    });
-
-    // Conectar ao AMI
-    amiConnection.connect();
-
-    // Tratar encerramento do processo
-    process.on('SIGINT', () => {
-      console.log('Encerrando conexões...');
-      amiConnection.disconnect();
-      process.exit();
-    });
-
-  } catch (error) {
-    console.error('Erro ao iniciar cliente AMI:', error);
-    process.exit(1);
+      
+      if (this.databaseService) {
+        await this.databaseService.close();
+      }
+      
+      process.exit(exitCode);
+    } catch (error) {
+      console.error('Erro durante encerramento:', error);
+      process.exit(1);
+    }
   }
 }
 
-// Iniciar o serviço
-startAMIClient();
+// Inicia a aplicação
+const app = new App();
+app.start();
