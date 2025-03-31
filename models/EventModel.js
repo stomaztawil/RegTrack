@@ -22,31 +22,29 @@ class EventModel {
       `);
       console.log('Tabela verificada/criada com sucesso');
 
-      await this.connection.execute(`CREATE VIEW view_peerStatus AS
+      await this.connection.execute(`CREATE VIEW view_reachable_periods AS
+        WITH ranked_events AS (
+            SELECT *,
+            LEAD(Status) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_status,
+            LEAD(Time) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_time
+            FROM ami_events
+        )
         SELECT 
-            a.id,
-            a.CompanyId,
-            a.Exten,
-            a.Status,
-            a.Time as StartTime,
-            MIN(b.Time) as EndTime,
-            TIMESTAMPDIFF(SECOND, a.Time, MIN(b.Time)) as DurationSeconds,
-            SEC_TO_TIME(TIMESTAMPDIFF(SECOND, a.Time, MIN(b.Time))) as FormattedDuration
-        FROM 
-            ami_events a
-        JOIN 
-            ami_events b ON a.CompanyId = b.CompanyId 
-            AND a.Exten = b.Exten
-            AND b.Time > a.Time
-            AND b.Status != a.Status
+            id,
+            CompanyId,
+            Exten,
+            Time as ReachableTime,
+            next_time as UnreachableTime,
+            TIMESTAMPDIFF(SECOND, Time, next_time) as DurationSeconds,
+            SEC_TO_TIME(TIMESTAMPDIFF(SECOND, Time, next_time)) as FormattedDuration
+        FROM ranked_events
         WHERE 
-            a.Status = 'Reachable'
-        GROUP BY 
-            a.id, a.CompanyId, a.Exten, a.Status, a.Time
-        HAVING
-            EndTime IS NOT NULL
+            Status = 'Reachable' AND 
+            next_status = 'Unreachable'
         ORDER BY 
-            a.Time;`
+            CompanyId, 
+            Exten, 
+            ReachableTime;`
        );
        console.log('View verificada/criada com sucesso');
     }
