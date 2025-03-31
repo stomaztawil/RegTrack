@@ -22,7 +22,7 @@ class EventModel {
       `);
       console.log('Tabela verificada/criada com sucesso');
 
-      await this.connection.execute(`CREATE VIEW view_reachable_periods AS
+      await this.connection.execute(`CREATE VIEW IF NOT EXISTS view_reachable_periods AS
         WITH ranked_events AS (
             SELECT *,
             LEAD(Status) OVER (PARTITION BY CompanyId, Exten ORDER BY Time) as next_status,
