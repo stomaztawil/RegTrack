@@ -44,8 +44,7 @@ class EventModel {
     ORDER BY 
         CompanyId, 
         Exten, 
-        ReachableTime;
-    );`
+        ReachableTime;`
     );
        console.log('View verificada/criada com sucesso');
     }
