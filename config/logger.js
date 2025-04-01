@@ -1,5 +1,5 @@
 const winston = require('winston');
-const { DailyRotateFile } = require('winston-daily-rotate-file');
+require('winston-daily-rotate-file');
 
 // Configuração dos níveis de log
 const levels = {
@@ -35,8 +35,8 @@ const transports = [
   // Logs no console
   new winston.transports.Console(),
   // Logs de erro em arquivo rotativo
-  new DailyRotateFile({
-    filename: 'logs/error-%DATE%.log',
+  new winston.transports.DailyRotateFile({
+    filename: '/var/log/Regtrack/error-%DATE%.log',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',
@@ -44,8 +44,8 @@ const transports = [
     level: 'error',
   }),
   // Todos os logs em arquivo rotativo
-  new DailyRotateFile({
-    filename: 'logs/all-%DATE%.log',
+  new winston.transports.DailyRotateFile({
+    filename: '/var/log/Regtrack/all-%DATE%.log',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',
