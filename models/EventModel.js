@@ -21,7 +21,7 @@ class EventModel {
           Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      this.logger.info('Table verified/created successfully');
+      //this.logger.info('Table verified/created successfully');
 
       await this.connection.execute(`CREATE OR REPLACE VIEW view_peerStatus AS
         WITH ranked_events AS (
@@ -47,7 +47,7 @@ class EventModel {
             Exten, 
             ReachableTime;`
       );
-      this.logger.info('View verificada/criada com sucesso');
+      //this.logger.info('View verificada/criada com sucesso');
     }
   
     async persistPeerStatus(event) {
@@ -59,7 +59,7 @@ class EventModel {
         [companyId, exten, event.peerstatus]
       );
       
-      this.logger.info('PeerStatus event successfully persisted');
+      //this.logger.info('PeerStatus event successfully persisted');
     }
   
     async close() {
