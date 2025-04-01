@@ -19,6 +19,7 @@
   "homepage": "https://github.com/stomaztawil/RegTrack#readme",
   "dependencies": {
     "asterisk-manager": "^0.2.0",
+    "dotenv": "^16.4.7",
     "mysql2": "^3.14.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
