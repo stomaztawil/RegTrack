@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
 module.exports = {
-    host: '10.37.129.3',
-    user: 'regtrack',
-    password: 'password',
-    database: 'Moonu',
-    tableName: 'ami_events'
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    tableName: process.env.DB_TABLE_NAME
   };

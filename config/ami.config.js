@@ -1,8 +1,14 @@
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+require('dotenv').config();
+
 module.exports = {
-    host: '10.37.129.3',
-    port: 5038,
-    username: 'admin',
-    password: 'password',
-    events: 'on',
-    allowedEvents: ['PeerStatus', 'ContactStatus', 'DeviceStateChange']
-  };
+  host: process.env.AMI_HOST,
+  port: parseInt(process.env.AMI_PORT),
+  username: process.env.AMI_USERNAME,
+  password: process.env.AMI_PASSWORD,
+  events: process.env.AMI_EVENTS,
+  allowedEvents: process.env.AMI_ALLOWED_EVENTS.split(',')
+};
