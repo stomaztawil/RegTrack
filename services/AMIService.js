@@ -18,18 +18,18 @@ class AMIService {
     );
 
     this.connection.on('connect', () => {
-      this.logger.info('Conectado ao AMI com sucesso');
+      this.logger.info(`Conectado ao AMI com sucesso`);
     });
 
     this.connection.on('error', (error) => {
-      this.logger.error('Erro na conexão AMI:', error);
+      this.logger.error(`Erro na conexão AMI: ${error}`);
     });
 
     this.connection.on('managerevent', (event) => {
       if (this.config.allowedEvents.includes(event.event)) {
         this.eventHandlers.handleEvent(event);
       } else {
-        this.logger.info('Evento não configurado em ami.config.js, ignorado:', event.event);
+        this.logger.info(`Evento não configurado em ami.config.js, ignorado: ${event.event}`);
       }
     });
 
@@ -39,7 +39,7 @@ class AMIService {
   disconnect() {
     if (this.connection) {
       this.connection.disconnect();
-      this.logger.info('')
+      this.logger.info(`Disconnected`);
     }
   }
 }

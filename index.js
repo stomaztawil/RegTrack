@@ -16,11 +16,11 @@ class App {
 
   async start() {
     try {
-      this.logger.info('Initializing application...');
+      this.logger.info(`Initializing application...`);
       
       // Inicializa banco de dados
       await this.databaseService.initialize();
-      this.logger.info('Database successfully initialized');
+      this.logger.info(`Database successfully initialized`);
       
       // Configura handlers de eventos
       this.eventHandlers = new EventHandlers(this.databaseService.getModel(), logger); // Passe o logger
@@ -28,15 +28,15 @@ class App {
       // Inicia serviço AMI
       this.amiService = new AMIService(amiConfig, this.eventHandlers, logger); // Passe o logger
       this.amiService.connect();
-      this.logger.info('AMI Service connected');
+      this.logger.info(`AMI Service connected`);
       
       // Configura tratamento de sinais do sistema
       this.setupShutdownHandlers();
       
-      this.logger.info('Application successfully started');
+      this.logger.info(`Application successfully started`);
     } catch (error) {
       this.logger.error(`Failed to load application: ${error.message}`);
-      this.logger.debug(error.stack);
+      this.logger.debug(`${error.stack}`);
       await this.shutdown(1);
     }
   }
@@ -52,33 +52,33 @@ class App {
     process.on('SIGINT', gracefulShutdown);
     process.on('SIGTERM', gracefulShutdown);
     process.on('uncaughtException', async (err) => {
-      this.logger.error('Uncaught exception:', err);
+      this.logger.error(`Uncaught exception: ${err}`);
       await gracefulShutdown();
     });
     process.on('unhandledRejection', async (reason) => {
-      this.logger.error('Unhandled rejection:', reason);
+      this.logger.error(`Unhandled rejection: ${reason}`);
       await gracefulShutdown();
     });
   }
 
   async shutdown(exitCode = 0) {
-    this.logger.info('Shutting down application...');
+    this.logger.info(`Shutting down application...`);
     
     try {
       if (this.amiService) {
-        this.logger.debug('Disconnecting AMI service...');
+        this.logger.debug(`Disconnecting AMI service...`);
         this.amiService.disconnect();
       }
       
       if (this.databaseService) {
-        this.logger.debug('Closing database connections...');
+        this.logger.debug(`Closing database connections...`);
         await this.databaseService.close();
       }
       
-      this.logger.info('Application shutdown complete');
+      this.logger.info(`Application shutdown complete`);
       process.exit(exitCode);
     } catch (error) {
-      this.logger.error('Error during shutdown:', error);
+      this.logger.error(`Error during shutdown: ${error}`);
       process.exit(1);
     }
   }
@@ -90,7 +90,7 @@ class App {
     const app = new App();
     await app.start();
   } catch (error) {
-    logger.error('Fatal error during application startup:', error);
+    this.logger.error(`Fatal error during application startup: ${error}`);
     process.exit(1);
   }
 })();
