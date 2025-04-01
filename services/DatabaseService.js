@@ -1,8 +1,8 @@
 const EventModel = require('../models/EventModel');
 
 class DatabaseService {
-  constructor(config) {
-    this.model = new EventModel(config);
+  constructor(config, logger) {
+    this.model = new EventModel(config, logger);
   }
 
   async initialize() {

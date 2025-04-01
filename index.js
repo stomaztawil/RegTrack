@@ -3,7 +3,7 @@ const mysqlConfig = require('./config/mysql.config');
 const AMIService = require('./services/AMIService');
 const DatabaseService = require('./services/DatabaseService');
 const EventHandlers = require('./utils/eventHandlers');
-//const logger = require('./config/logger'); // Corrigi o nome do arquivo (de 'loger' para 'logger')
+const logger = require('./config/logger'); // Corrigi o nome do arquivo (de 'loger' para 'logger')
 
 class App {
   constructor() {
