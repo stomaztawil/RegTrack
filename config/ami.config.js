@@ -2,8 +2,6 @@ require('dotenv').config();
 
 dotenv.config();
 
-require('dotenv').config();
-
 module.exports = {
   host: process.env.AMI_HOST,
   port: parseInt(process.env.AMI_PORT),
