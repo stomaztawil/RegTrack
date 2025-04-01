@@ -1,7 +1,8 @@
 class EventModel {
-    constructor(mysqlConfig) {
+    constructor(mysqlConfig, logger) {
       this.mysqlConfig = mysqlConfig;
       this.tableName = mysqlConfig.tableName;
+      this.logger = logger;
     }
   
     async initialize() {
@@ -20,7 +21,7 @@ class EventModel {
           Time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      console.log('Tabela verificada/criada com sucesso');
+      this.logger.info('Table verified/created successfully');
 
       await this.connection.execute(`CREATE OR REPLACE VIEW view_peerStatus AS
         WITH ranked_events AS (
@@ -46,7 +47,7 @@ class EventModel {
             Exten, 
             ReachableTime;`
       );
-       console.log('View verificada/criada com sucesso');
+      this.logger.info('View verificada/criada com sucesso');
     }
   
     async persistPeerStatus(event) {
@@ -58,7 +59,7 @@ class EventModel {
         [companyId, exten, event.peerstatus]
       );
       
-      console.log('Evento PeerStatus persistido com sucesso');
+      this.logger.info('PeerStatus event successfully persisted');
     }
   
     async close() {

@@ -3,9 +3,11 @@ const mysqlConfig = require('./config/mysql.config');
 const AMIService = require('./services/AMIService');
 const DatabaseService = require('./services/DatabaseService');
 const EventHandlers = require('./utils/eventHandlers');
+const Logger = require('./config/logger');
 
 class App {
   constructor() {
+    this.logger = Logger;
     this.databaseService = new DatabaseService(mysqlConfig);
     this.eventHandlers = null;
     this.amiService = null;
@@ -13,8 +15,10 @@ class App {
 
   async start() {
     try {
+      this.logger.info('Initializing application...');
       // Inicializa banco de dados
       await this.databaseService.initialize();
+      this.logger.info('Database successfully initialized');
       
       // Configura handlers de eventos
       this.eventHandlers = new EventHandlers(this.databaseService.getModel());
@@ -22,14 +26,17 @@ class App {
       // Inicia serviço AMI
       this.amiService = new AMIService(amiConfig, this.eventHandlers);
       this.amiService.connect();
+      this.logger.info('AMI Service connected');
       
       // Configura tratamento de sinais do sistema
       this.setupShutdownHandlers();
       
-      console.log('Aplicação iniciada com sucesso');
+      
+      this.logger.info('Application successfully loaded');
     } catch (error) {
-      console.error('Falha ao iniciar aplicação:', error);
-      this.shutdown(1);
+      this.logger.error(`Fail to load application: ${error.message}`);
+      this.logger.debug(error.stack);
+      await this.shutdown(1);
     }
   }
 
@@ -39,7 +46,7 @@ class App {
   }
 
   async shutdown(exitCode = 0) {
-    console.log('Encerrando aplicação...');
+    this.logger.info(' Closing the application...');
     
     try {
       if (this.amiService) {
@@ -52,7 +59,7 @@ class App {
       
       process.exit(exitCode);
     } catch (error) {
-      console.error('Erro durante encerramento:', error);
+      this.logger.error('Closing error: ', error);
       process.exit(1);
     }
   }

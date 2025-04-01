@@ -11,3 +11,8 @@
 # Funcionamento:
     Tabela ami_events - armazena a company, o ramal (exten), o status (reachable ou unreachable) e a data e horário do evento.
     View view_peerStatus - lista horário de reachable, hora'rio do subsequente unreachable e o delta do tempo entre os dois eventos.
+
+    Colocar aqui as tabelas e view. Remover do código. A criação de tabelas será feita pelo painel.
+
+# Fazer e configurar o log do projeto.
+# Criar um .env para armazenar as senhas de acesso
