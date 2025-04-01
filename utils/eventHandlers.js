@@ -1,6 +1,7 @@
 class EventHandlers {
-    constructor(eventModel) {
+    constructor(eventModel, logger) {
       this.model = eventModel;
+      this.logger = logger || console;
     }
   
     async handleEvent(event) {
