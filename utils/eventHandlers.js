@@ -6,12 +6,12 @@ class EventHandlers {
   
     async handleEvent(event) {
       const eventName = event.event.replace(/\s+/g, '_').toLowerCase();
-      this.logger.info("Event received: ", eventName);
+      this.logger.info(`Event received: , ${eventName}`);
       
       try {
         switch(eventName) {
           case 'devicestatechange':
-            this.logger.info('Nothing to do for event: ', eventName);
+            this.logger.info(`Nothing to do for event: ', ${eventName}`);
             break;
 
           case 'peerstatus':
