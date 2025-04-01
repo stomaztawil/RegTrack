@@ -16,11 +16,11 @@ class App {
 
   async start() {
     try {
-      this.logger.info('Initializing application...');
+      //this.logger.info('Initializing application...');
       
       // Inicializa banco de dados
       await this.databaseService.initialize();
-      this.logger.info('Database successfully initialized');
+      //this.logger.info('Database successfully initialized');
       
       // Configura handlers de eventos
       this.eventHandlers = new EventHandlers(this.databaseService.getModel(), logger); // Passe o logger
@@ -28,12 +28,12 @@ class App {
       // Inicia serviço AMI
       this.amiService = new AMIService(amiConfig, this.eventHandlers, logger); // Passe o logger
       this.amiService.connect();
-      this.logger.info('AMI Service connected');
+      //this.logger.info('AMI Service connected');
       
       // Configura tratamento de sinais do sistema
       this.setupShutdownHandlers();
       
-      this.logger.info('Application successfully started');
+      //this.logger.info('Application successfully started');
     } catch (error) {
       this.logger.error(`Failed to load application: ${error.message}`);
       this.logger.debug(error.stack);
