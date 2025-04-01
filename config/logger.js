@@ -1,6 +1,5 @@
 const winston = require('winston');
-//require('winston-daily-rotate-file');
-const DailyRotateFile = require('winston-daily-rotate-file').DailyRotateFile;
+const DailyRotateFile = require('winston-daily-rotate-file');
 
 // Configuração dos níveis de log
 const levels = {
@@ -56,10 +55,14 @@ const transports = [
 
 // Cria o logger
 const Logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  levels,
-  format,
-  transports,
-});
+    level: process.env.LOG_LEVEL || 'info',
+    format: winston.format.combine(
+      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      winston.format.printf(
+        info => `${info.timestamp} ${info.level}: ${info.message}`
+      )
+    ),
+    transports
+  });
 
 module.exports = Logger;
