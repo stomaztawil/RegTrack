@@ -2,7 +2,7 @@ class EventModel {
     constructor(mysqlConfig, logger) {
       this.mysqlConfig = mysqlConfig;
       this.tableName = mysqlConfig.tableName;
-      const logger = require('./config/logger'); // Corrigi o nome do arquivo (de 'loger' para 'logger')
+      this.logger = logger;
     }
   
     async initialize() {
