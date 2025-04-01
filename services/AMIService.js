@@ -1,10 +1,11 @@
 const ami = require('asterisk-manager');
 
 class AMIService {
-  constructor(config, eventHandlers) {
+  constructor(config, eventHandlers, logger) {
     this.config = config;
     this.eventHandlers = eventHandlers;
     this.connection = null;
+    this.logger = logger || console; // Fallback para console
   }
 
   connect() {
