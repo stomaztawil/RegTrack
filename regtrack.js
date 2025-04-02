@@ -90,6 +90,7 @@ class App {
     const app = new App();
     await app.start();
   } catch (error) {
+    this.logger = logger;
     this.logger.error(`Fatal error during application startup: ${error}`);
     process.exit(1);
   }
