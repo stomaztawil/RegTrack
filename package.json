@@ -12,6 +12,10 @@
     "testEnvironment": "node",
     "collectCoverageFrom": [
       "lib/**/*.js"
+      ],
+      "coveragePathIgnorePatterns": [
+        "/node_modules/",
+        "/__tests__/"
       ]
   },
   "repository": {
