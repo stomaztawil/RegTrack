@@ -5,8 +5,6 @@ const DatabaseService = require('./lib/services/DatabaseService');
 const EventHandlers = require('./lib/utils/eventHandlers');
 const logger = require('./lib/infra/logger');
 
-console.log(dbConfig);
-
 class App {
   constructor() {
     this.logger = logger;
