@@ -1,22 +1,45 @@
-// __tests__/unit/services/DatabaseService.test.js
 const DatabaseService = require('../../../lib/services/DatabaseService');
+const EventModel = require('../../../lib/models/EventModel');
 
-describe('DatabaseService - Cenários', () => {
+// Mock the entire EventModel class
+jest.mock('../../../lib/models/EventModel');
+
+describe('DatabaseService', () => {
+  let dbService;
+  const mockConfig = { dbHost: 'localhost' };
+  const mockLogger = { info: jest.fn() };
+
   beforeEach(() => {
-    jest.clearAllMocks(); // Reset entre testes
+    // Fresh instance for each test
+    dbService = new DatabaseService(mockConfig, mockLogger);
+    
+    // Clear all mock calls between tests
+    jest.clearAllMocks();
   });
 
-  test('Sucesso ao salvar evento', async () => {
-    const result = await DatabaseService.saveEvent({
-      peer: 'SIP/1000',
-      status: 'Reachable'
+  describe('Initialization', () => {
+    test('should initialize EventModel with config and logger', () => {
+      expect(EventModel).toHaveBeenCalledWith(mockConfig, mockLogger);
     });
-    expect(result).toEqual({ id: 1 });
+
+    test('initialize() should call model.initialize()', async () => {
+      await dbService.initialize();
+      expect(dbService.getModel().initialize).toHaveBeenCalled();
+    });
   });
 
-  test('Falha ao salvar evento', async () => {
-    await expect(
-      DatabaseService.saveEvent({ peer: 'SIP/1000', status: 'Invalid' })
-    ).rejects.toThrow('DB Error');
+  describe('Shutdown', () => {
+    test('close() should call model.close()', async () => {
+      await dbService.close();
+      expect(dbService.getModel().close).toHaveBeenCalled();
+    });
+  });
+
+  describe('Model Access', () => {
+    test('getModel() should return EventModel instance', () => {
+      const model = dbService.getModel();
+      expect(model).toBeInstanceOf(EventModel);
+      expect(model.initialize).toBeDefined();
+    });
   });
 });
