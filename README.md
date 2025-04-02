@@ -28,6 +28,14 @@ npm install
 ---
 
 ## ⚙️ Configuration
+You need a .env, copy the .env.example and make changes ass you need
+```bash
+cp .env.example .env
+vim .env
+```
+
+---
+
 Make sure to configure the asterisk manager user and on  /etc/asterisk/manager.conf:
 ```bash
 [general]
