@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stomaztawil/RegTrack.git"
+    "url": "git+https://github.com/stomaztawil/regtrack.git"
   },
   "author": "Thiago B Tawil",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/stomaztawil/RegTrack/issues"
+    "url": "https://github.com/stomaztawil/regtrack/issues"
   },
-  "homepage": "https://github.com/stomaztawil/RegTrack#readme",
+  "homepage": "https://github.com/stomaztawil/regtrack#readme",
   "dependencies": {
     "asterisk-manager": "^0.2.0",
     "dotenv": "^16.4.7",
