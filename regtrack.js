@@ -8,10 +8,10 @@ const logger = require('./lib/infra/logger');
 class App {
   constructor() {
     this.logger = logger;
-    this.databaseService = new DatabaseService(dbConfig, logger); // Passe o logger para o DatabaseService
+    this.databaseService = new DatabaseService(dbConfig, logger);
     this.eventHandlers = null;
     this.amiService = null;
-    this.shuttingDown = false; // Flag para controlar o estado de encerramento
+    this.shuttingDown = false;
   }
 
   async start() {
