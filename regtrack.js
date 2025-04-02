@@ -3,7 +3,9 @@ const mysqlConfig = require('./lib/infra/config');
 const AMIService = require('./lib/services/AMIService');
 const DatabaseService = require('./lib/services/DatabaseService');
 const EventHandlers = require('./lib/utils/eventHandlers');
-const logger = require('./lib/infra/logger'); 
+const logger = require('./lib/infra/logger');
+
+console.log(amiConfig);
 
 class App {
   constructor() {
