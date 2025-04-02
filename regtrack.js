@@ -1,16 +1,16 @@
 const amiConfig = require('./lib/infra/config');
-const mysqlConfig = require('./lib/infra/config');
+const dbConfig = require('./lib/infra/config');
 const AMIService = require('./lib/services/AMIService');
 const DatabaseService = require('./lib/services/DatabaseService');
 const EventHandlers = require('./lib/utils/eventHandlers');
 const logger = require('./lib/infra/logger');
 
-console.log(amiConfig);
+console.log(dbConfig);
 
 class App {
   constructor() {
     this.logger = logger;
-    this.databaseService = new DatabaseService(mysqlConfig, logger); // Passe o logger para o DatabaseService
+    this.databaseService = new DatabaseService(dbConfig, logger); // Passe o logger para o DatabaseService
     this.eventHandlers = null;
     this.amiService = null;
     this.shuttingDown = false; // Flag para controlar o estado de encerramento
