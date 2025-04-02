@@ -1,9 +1,9 @@
-const amiConfig = require('./config/ami.config');
-const mysqlConfig = require('./config/mysql.config');
-const AMIService = require('./services/AMIService');
-const DatabaseService = require('./services/DatabaseService');
-const EventHandlers = require('./utils/eventHandlers');
-const logger = require('./config/logger'); // Corrigi o nome do arquivo (de 'loger' para 'logger')
+const amiConfig = require('./lib/infra/config');
+const mysqlConfig = require('./lib/infra/config');
+const AMIService = require('./lib/services/AMIService');
+const DatabaseService = require('./lib/services/DatabaseService');
+const EventHandlers = require('./lib/utils/eventHandlers');
+const logger = require('./lib/infra/logger'); 
 
 class App {
   constructor() {
