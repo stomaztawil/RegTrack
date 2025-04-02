@@ -4,8 +4,15 @@
   "description": "",
   "main": "regtrack.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
     "start": "node regtrack.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "lib/**/*.js"
+      ]
   },
   "repository": {
     "type": "git",

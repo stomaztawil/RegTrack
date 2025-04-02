@@ -28,7 +28,38 @@ npm install
 ---
 
 ## ⚙️ Configuration
-Rename .env.example to .env and configure as your need.
+Make sure to configure the asterisk manager user and on  /etc/asterisk/manager.conf:
+```bash
+[general]
+enabled = yes
+webenabled = no
+
+port = 5038
+bindaddr = 0.0.0.0
+allowmultiplelogin = yes
+
+[admin]
+secret=password
+permit=0.0.0.0/0.0.0.0
+
+read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan,event
+write = system,call,agent,user,config,command,reporting,originate,message,event
+
+eventfilter = !* ; Primeiro nega todos os eventos
+eventfilter = PeerStatus ; Depois permite apenas PeerStatus
+```
+
+Reload AMI:
+```bash
+sudo asterisk -rx "manager reload"
+```
+Mysql Moonu Database and user examples:
+```bash
+CREATE DATABASE Moonu;
+CREATE USER 'regtrack'@'10.37.129.3' IDENTIFIED BY 'secure_password';
+GRANT ALL PRIVILEGES ON Moonu.* TO 'regtrack'@'10.37.129.3';
+FLUSH PRIVILEGES;
+```
 
 ---
 
